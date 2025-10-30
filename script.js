@@ -173,68 +173,82 @@ class RideCalculator {
     }
 
     calculate() {
-        // Get input values
-        const offerAmount = parseFloat(document.getElementById('offerAmount').value);
-        const distance = parseFloat(document.getElementById('distance').value);
-        const duration = parseFloat(document.getElementById('duration').value);
-        const trafficLevel = parseFloat(document.getElementById('trafficLevel').value);
-        const operatingCost = parseFloat(document.getElementById('operatingCost').value);
-        const minHourlyRate = parseFloat(document.getElementById('minHourlyRate').value);
+    // Get input values
+    const offerAmount = parseFloat(document.getElementById('offerAmount').value);
+    const distance = parseFloat(document.getElementById('distance').value);
+    const duration = parseFloat(document.getElementById('duration').value);
+    const trafficLevel = parseFloat(document.getElementById('trafficLevel').value);
+    const operatingCost = parseFloat(document.getElementById('operatingCost').value);
+    const minHourlyRate = parseFloat(document.getElementById('minHourlyRate').value);
+    const appFeePercentage = parseFloat(document.getElementById('appFeePercentage').value);
 
-        // Validate inputs
-        if (!this.validateInputs(offerAmount, distance, duration)) {
-            return;
-        }
-
-        // Adjust duration for traffic
-        const adjustedDuration = duration * trafficLevel;
-
-        // Calculate costs and profits
-        const totalOperatingCost = distance * operatingCost;
-        const netProfit = offerAmount - totalOperatingCost;
-        const effectiveHourlyRate = (netProfit / adjustedDuration) * 60;
-        const profitPerKm = netProfit / distance;
-
-        // Determine recommendation
-        const recommendation = this.getRecommendation(effectiveHourlyRate, minHourlyRate, netProfit);
-        
-        // Display results
-        this.displayResults({
-            totalOperatingCost,
-            netProfit,
-            effectiveHourlyRate,
-            profitPerKm,
-            recommendation,
-            adjustedDuration
-        });
-
-        // Save to history
-        this.saveToHistory({
-            offerAmount,
-            distance,
-            duration: adjustedDuration,
-            netProfit,
-            effectiveHourlyRate,
-            recommendation,
-            timestamp: new Date().toLocaleString()
-        });
+    // Validate inputs
+    if (!this.validateInputs(offerAmount, distance, duration, appFeePercentage)) {
+        return;
     }
 
-    validateInputs(offerAmount, distance, duration) {
-        if (!offerAmount || offerAmount <= 0) {
-            alert(this.languageManager.currentLang === 'es' ? 'Por favor ingrese un monto de oferta válido' : 'Please enter a valid offer amount');
-            return false;
-        }
-        if (!distance || distance <= 0) {
-            alert(this.languageManager.currentLang === 'es' ? 'Por favor ingrese una distancia válida' : 'Please enter a valid distance');
-            return false;
-        }
-        if (!duration || duration <= 0) {
-            alert(this.languageManager.currentLang === 'es' ? 'Por favor ingrese una duración válida' : 'Please enter a valid duration');
-            return false;
-        }
-        return true;
+    // Calculate app fee and adjusted offer
+    const appFeeAmount = offerAmount * (appFeePercentage / 100);
+    const earningsAfterFee = offerAmount - appFeeAmount;
+
+    // Adjust duration for traffic
+    const adjustedDuration = duration * trafficLevel;
+
+    // Calculate costs and profits
+    const totalOperatingCost = distance * operatingCost;
+    const netProfit = earningsAfterFee - totalOperatingCost;
+    const effectiveHourlyRate = (netProfit / adjustedDuration) * 60;
+    const profitPerKm = netProfit / distance;
+
+    // Determine recommendation
+    const recommendation = this.getRecommendation(effectiveHourlyRate, minHourlyRate, netProfit);
+    
+    // Display results
+    this.displayResults({
+        totalOperatingCost,
+        netProfit,
+        effectiveHourlyRate,
+        profitPerKm,
+        recommendation,
+        adjustedDuration,
+        appFeeAmount,
+        earningsAfterFee,
+        originalOffer: offerAmount
+    });
+
+    // Save to history
+    this.saveToHistory({
+        offerAmount,
+        distance,
+        duration: adjustedDuration,
+        netProfit,
+        effectiveHourlyRate,
+        recommendation,
+        appFeeAmount,
+        earningsAfterFee,
+        timestamp: new Date().toLocaleString()
+    });
+}
+
+    validateInputs(offerAmount, distance, duration, appFeePercentage) {
+    if (!offerAmount || offerAmount <= 0) {
+        alert(this.languageManager.currentLang === 'es' ? 'Por favor ingrese un monto de oferta válido' : 'Please enter a valid offer amount');
+        return false;
     }
+    if (!distance || distance <= 0) {
+        alert(this.languageManager.currentLang === 'es' ? 'Por favor ingrese una distancia válida' : 'Please enter a valid distance');
+        return false;
+    }
+    if (!duration || duration <= 0) {
+        alert(this.languageManager.currentLang === 'es' ? 'Por favor ingrese una duración válida' : 'Please enter a valid duration');
+        return false;
+    }
+    if (!appFeePercentage || appFeePercentage < 0 || appFeePercentage > 100) {
+        alert(this.languageManager.currentLang === 'es' ? 'Por favor ingrese un porcentaje de tarifa válido (0-100%)' : 'Please enter a valid fee percentage (0-100%)');
+        return false;
+    }
+    return true;
+}
 
     getRecommendation(hourlyRate, minHourlyRate, netProfit) {
         if (netProfit <= 0) {
@@ -267,38 +281,94 @@ class RideCalculator {
     }
 
     displayResults(results) {
-        const resultsDiv = document.getElementById('results');
-        resultsDiv.classList.remove('hidden');
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.classList.remove('hidden');
 
-        // Update values
-        document.getElementById('totalCost').textContent = `$${results.totalOperatingCost.toFixed(2)}`;
-        document.getElementById('netProfit').textContent = `$${results.netProfit.toFixed(2)}`;
-        document.getElementById('hourlyRate').textContent = `$${results.effectiveHourlyRate.toFixed(2)}/hr`;
-        document.getElementById('profitPerKm').textContent = `$${results.profitPerKm.toFixed(2)}/km`;
+    // Update values
+    document.getElementById('totalCost').textContent = `$${results.totalOperatingCost.toFixed(2)}`;
+    document.getElementById('netProfit').textContent = `$${results.netProfit.toFixed(2)}`;
+    document.getElementById('hourlyRate').textContent = `$${results.effectiveHourlyRate.toFixed(2)}/hr`;
+    document.getElementById('profitPerKm').textContent = `$${results.profitPerKm.toFixed(2)}/km`;
 
-        // Update recommendation
-        const recommendationText = document.getElementById('recommendationText');
-        const reasoningText = document.getElementById('reasoningText');
+    // Update recommendation
+    const recommendationText = document.getElementById('recommendationText');
+    const reasoningText = document.getElementById('reasoningText');
+    
+    recommendationText.textContent = results.recommendation.text;
+    recommendationText.className = results.recommendation.class;
+
+    // Add reasoning
+    reasoningText.textContent = this.getReasoning(results);
+
+    // Update meter
+    document.getElementById('meterFill').style.width = `${results.recommendation.score}%`;
+
+    // Add app fee information to results
+    this.displayAppFeeResults(results);
+}
+
+displayAppFeeResults(results) {
+    // Create or update app fee result items
+    let appFeeItem = document.getElementById('appFeeItem');
+    let earningsItem = document.getElementById('earningsAfterFeeItem');
+
+    if (!appFeeItem) {
+        appFeeItem = document.createElement('div');
+        appFeeItem.id = 'appFeeItem';
+        appFeeItem.className = 'result-item';
         
-        recommendationText.textContent = results.recommendation.text;
-        recommendationText.className = results.recommendation.class;
-
-        // Add reasoning
-        reasoningText.textContent = this.getReasoning(results);
-
-        // Update meter
-        document.getElementById('meterFill').style.width = `${results.recommendation.score}%`;
+        const labelSpan = document.createElement('span');
+        labelSpan.className = 'label';
+        labelSpan.setAttribute('data-i18n', 'appFeeAmount');
+        labelSpan.textContent = this.languageManager.getText('appFeeAmount');
+        
+        const valueSpan = document.createElement('span');
+        valueSpan.className = 'value';
+        valueSpan.id = 'appFeeAmount';
+        
+        appFeeItem.appendChild(labelSpan);
+        appFeeItem.appendChild(valueSpan);
+        
+        // Insert after total operating cost
+        const totalCostItem = document.getElementById('totalCost').closest('.result-item');
+        totalCostItem.parentNode.insertBefore(appFeeItem, totalCostItem.nextSibling);
     }
+
+    if (!earningsItem) {
+        earningsItem = document.createElement('div');
+        earningsItem.id = 'earningsAfterFeeItem';
+        earningsItem.className = 'result-item';
+        
+        const labelSpan = document.createElement('span');
+        labelSpan.className = 'label';
+        labelSpan.setAttribute('data-i18n', 'earningsAfterFee');
+        labelSpan.textContent = this.languageManager.getText('earningsAfterFee');
+        
+        const valueSpan = document.createElement('span');
+        valueSpan.className = 'value';
+        valueSpan.id = 'earningsAfterFee';
+        
+        earningsItem.appendChild(labelSpan);
+        earningsItem.appendChild(valueSpan);
+        
+        // Insert after app fee item
+        appFeeItem.parentNode.insertBefore(earningsItem, appFeeItem.nextSibling);
+    }
+
+    // Update values
+    document.getElementById('appFeeAmount').textContent = `-$${results.appFeeAmount.toFixed(2)}`;
+    document.getElementById('earningsAfterFee').textContent = `$${results.earningsAfterFee.toFixed(2)}`;
+}
 
     getReasoning(results) {
-        if (results.netProfit <= 0) {
-            return this.languageManager.getText('reasoningLoseMoney');
-        } else if (results.effectiveHourlyRate < parseFloat(document.getElementById('minHourlyRate').value)) {
-            return `${this.languageManager.getText('reasoningBelowRate')} ($${results.effectiveHourlyRate.toFixed(2)})`;
-        } else {
-            return this.languageManager.getText('reasoningGood');
-        }
+    if (results.netProfit <= 0) {
+        return this.languageManager.getText('reasoningLoseMoney');
+    } else if (results.effectiveHourlyRate < parseFloat(document.getElementById('minHourlyRate').value)) {
+        return `${this.languageManager.getText('reasoningBelowRate')} ($${results.effectiveHourlyRate.toFixed(2)})`;
+    } else {
+        return this.languageManager.getText('reasoningGood');
     }
+}
 
     saveToHistory(calculation) {
         this.calculationsHistory.unshift(calculation);
@@ -368,3 +438,30 @@ class RideCalculator {
 document.addEventListener('DOMContentLoaded', () => {
     new RideCalculator();
 });
+
+const translations = {
+    en: {
+        // ... existing translations ...
+        appFeePercentage: "inDriver App Fee (%):",
+        appFeeHelp: "Platform commission fee",
+        appFeeAmount: "App Fee Amount:",
+        earningsAfterFee: "Earnings After Fee:",
+        
+        // Update the reasoning to include app fee
+        reasoningLoseMoney: "The operating costs and app fee exceed the offer amount. You would lose money accepting this ride.",
+        reasoningBelowRate: "Your effective hourly rate after fees is below your minimum acceptable rate.",
+        reasoningGood: "This ride meets or exceeds your profitability criteria after accounting for all fees."
+    },
+    es: {
+        // ... existing Spanish translations ...
+        appFeePercentage: "Tarifa de inDriver (%):",
+        appFeeHelp: "Comisión de la plataforma",
+        appFeeAmount: "Monto de la Tarifa:",
+        earningsAfterFee: "Ganancias Después de Tarifa:",
+        
+        // Update Spanish reasoning
+        reasoningLoseMoney: "Los costos operativos y la tarifa de la aplicación superan el monto de la oferta. Perderías dinero aceptando este viaje.",
+        reasoningBelowRate: "Tu tarifa horaria efectiva después de las tarifas está por debajo de tu tarifa mínima aceptable.",
+        reasoningGood: "Este viaje cumple o supera tus criterios de rentabilidad después de contabilizar todas las tarifas."
+    }
+};

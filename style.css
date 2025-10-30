@@ -36,4 +36,47 @@
     .language-switcher select {
         width: 100%;
     }
+    /* App Fee specific styling */
+#appFeeAmount {
+    color: var(--danger);
+    font-weight: 700;
 }
+
+#earningsAfterFee {
+    color: var(--secondary);
+    font-weight: 700;
+}
+
+/* Fee breakdown emphasis */
+.fee-breakdown {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+    border-radius: 12px;
+    padding: 15px;
+    margin: 10px 0;
+    border: 1px solid var(--border);
+}
+
+.fee-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fee-item:last-child {
+    border-bottom: none;
+}
+
+.fee-item .label {
+    color: var(--text-secondary);
+}
+
+.fee-item .value.negative {
+    color: var(--danger);
+}
+
+.fee-item .value.positive {
+    color: var(--secondary);
+}
+}
+
