@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ride Profitability Calculator</title>
-    <meta name="description" content="Calculate if ride offers are worth taking based on distance, time, and traffic">
+    <title>Calculadora de Rentabilidad para Conductores</title>
+    <meta name="description" content="Calcula si los viajes valen la pena para conductores de Uber e inDriver en El Salvador">
     <link rel="stylesheet" href="style.css">
-    <meta name="theme-color" content="#3498db">
+    <meta name="theme-color" content="#6366f1">
     <link rel="manifest" href="manifest.json">
 </head>
 <body>
     <div class="container">
         <header>
             <div class="header-top">
-                <h1 data-i18n="appTitle">🚗 Ride Profitability Calculator</h1>
+                <h1 data-i18n="appTitle">🚗 Calculadora de Ganancias</h1>
                 <div class="language-switcher">
                     <select id="languageSelect">
                         <option value="en">English</option>
@@ -21,88 +21,104 @@
                     </select>
                 </div>
             </div>
-            <p data-i18n="appSubtitle">Determine if a ride offer is worth accepting</p>
+            <p data-i18n="appSubtitle">Para conductores de Uber e inDriver en El Salvador</p>
         </header>
 
         <div class="calculator">
             <div class="input-section">
+                <!-- Platform Selection -->
                 <div class="form-group">
-                    <label for="offerAmount" data-i18n="offerAmount">Ride Offer Amount ($):</label>
-                    <input type="number" id="offerAmount" placeholder="Enter offer amount" min="0" step="0.01">
-                    <div class="form-group">
-    <label for="appFeePercentage" data-i18n="appFeePercentage">inDriver App Fee (%):</label>
-    <input type="number" id="appFeePercentage" value="12.99" min="0" max="100" step="0.01">
-    <small data-i18n="appFeeHelp">Platform commission fee</small>
-</div>
-                </div>
-
-                <div class="form-group">
-                    <label for="distance" data-i18n="distance">Distance (km):</label>
-                    <input type="number" id="distance" placeholder="Enter distance in km" min="0" step="0.1">
-                </div>
-
-                <div class="form-group">
-                    <label for="duration" data-i18n="duration">Estimated Duration (minutes):</label>
-                    <input type="number" id="duration" placeholder="Enter duration in minutes" min="0" step="1">
-                </div>
-
-                <div class="form-group">
-                    <label for="trafficLevel" data-i18n="trafficLevel">Traffic Level:</label>
-                    <select id="trafficLevel">
-                        <option value="1" data-i18n="lightTraffic">Light Traffic</option>
-                        <option value="1.2" selected data-i18n="moderateTraffic">Moderate Traffic</option>
-                        <option value="1.5" data-i18n="heavyTraffic">Heavy Traffic</option>
-                        <option value="2" data-i18n="severeTraffic">Severe Traffic</option>
+                    <label for="platform" data-i18n="platform">Plataforma:</label>
+                    <select id="platform">
+                        <option value="indrive" data-i18n="indrive">inDriver</option>
+                        <option value="uber" data-i18n="uber">Uber</option>
+                        <option value="custom" data-i18n="custom">Otra Plataforma</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label for="operatingCost" data-i18n="operatingCost">Operating Cost per km ($):</label>
-                    <input type="number" id="operatingCost" value="0.50" min="0" step="0.01">
-                    <small data-i18n="operatingCostHelp">Includes fuel, maintenance, etc.</small>
+                    <label for="offerAmount" data-i18n="offerAmount">Monto de la Oferta ($):</label>
+                    <input type="number" id="offerAmount" placeholder="Ingrese el monto" min="0" step="0.01">
                 </div>
 
                 <div class="form-group">
-                    <label for="minHourlyRate" data-i18n="minHourlyRate">Minimum Acceptable Hourly Rate ($):</label>
-                    <input type="number" id="minHourlyRate" value="16.00" min="0" step="0.01">
+                    <label for="appFeePercentage" data-i18n="appFeePercentage">Comisión de Plataforma (%):</label>
+                    <input type="number" id="appFeePercentage" value="12.99" min="0" max="100" step="0.01">
+                    <small id="feeDescription" data-i18n="indriveFee">Comisión estándar de inDriver: 12.99%</small>
                 </div>
 
-                <button id="calculateBtn" data-i18n="calculateBtn">Calculate Profitability</button>
+                <div class="form-group">
+                    <label for="distance" data-i18n="distance">Distancia (km):</label>
+                    <input type="number" id="distance" placeholder="Distancia en km" min="0" step="0.1">
+                </div>
+
+                <div class="form-group">
+                    <label for="duration" data-i18n="duration">Tiempo Estimado (minutos):</label>
+                    <input type="number" id="duration" placeholder="Tiempo en minutos" min="0" step="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="trafficLevel" data-i18n="trafficLevel">Nivel de Tráfico:</label>
+                    <select id="trafficLevel">
+                        <option value="1" data-i18n="lightTraffic">Tráfico Liviano</option>
+                        <option value="1.2" selected data-i18n="moderateTraffic">Tráfico Moderado</option>
+                        <option value="1.5" data-i18n="heavyTraffic">Tráfico Pesado</option>
+                        <option value="2" data-i18n="severeTraffic">Tráfico Severo</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="operatingCost" data-i18n="operatingCost">Costo por km ($):</label>
+                    <input type="number" id="operatingCost" value="0.45" min="0" step="0.01">
+                    <small data-i18n="operatingCostHelp">Incluye gasolina, mantenimiento, seguro</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="minHourlyRate" data-i18n="minHourlyRate">Tarifa Horaria Mínima ($):</label>
+                    <input type="number" id="minHourlyRate" value="8.00" min="0" step="0.01">
+                </div>
+
+                <button id="calculateBtn" data-i18n="calculateBtn">Calcular Rentabilidad</button>
             </div>
 
             <div class="results-section">
                 <div id="results" class="results hidden">
-                    <h3 data-i18n="analysisResults">Analysis Results</h3>
+                    <h3 data-i18n="analysisResults">Resultados del Análisis</h3>
                     
                     <div class="result-item">
-                        <span class="label" data-i18n="totalOperatingCost">Total Operating Cost:</span>
+                        <span class="label" data-i18n="totalOperatingCost">Costo Operativo Total:</span>
                         <span id="totalCost" class="value">$0.00</span>
                     </div>
 
                     <div class="result-item">
-                        <span class="label" data-i18n="netProfit">Net Profit:</span>
+                        <span class="label" data-i18n="earningsAfterFee">Ganancias Después de Comisión:</span>
+                        <span id="earningsAfterFee" class="value">$0.00</span>
+                    </div>
+
+                    <div class="result-item">
+                        <span class="label" data-i18n="netProfit">Ganancia Neta:</span>
                         <span id="netProfit" class="value">$0.00</span>
                     </div>
 
                     <div class="result-item">
-                        <span class="label" data-i18n="effectiveHourlyRate">Effective Hourly Rate:</span>
+                        <span class="label" data-i18n="effectiveHourlyRate">Tarifa Horaria Efectiva:</span>
                         <span id="hourlyRate" class="value">$0.00/hr</span>
                     </div>
 
                     <div class="result-item">
-                        <span class="label" data-i18n="profitPerKm">Profit per Kilometer:</span>
+                        <span class="label" data-i18n="profitPerKm">Ganancia por Kilómetro:</span>
                         <span id="profitPerKm" class="value">$0.00/km</span>
                     </div>
 
                     <div class="recommendation">
-                        <h4 id="recommendationText" data-i18n="recommendationDefault">Recommendation will appear here</h4>
+                        <h4 id="recommendationText" data-i18n="recommendationDefault">La recomendación aparecerá aquí</h4>
                         <p id="reasoningText"></p>
                     </div>
 
                     <div class="profitability-meter">
                         <div class="meter-label">
-                            <span data-i18n="poor">Poor</span>
-                            <span data-i18n="excellent">Excellent</span>
+                            <span data-i18n="poor">Pobre</span>
+                            <span data-i18n="excellent">Excelente</span>
                         </div>
                         <div class="meter-bar">
                             <div id="meterFill" class="meter-fill"></div>
@@ -113,9 +129,9 @@
         </div>
 
         <div class="history-section">
-            <h3 data-i18n="recentCalculations">Recent Calculations</h3>
+            <h3 data-i18n="recentCalculations">Cálculos Recientes</h3>
             <div id="historyList" class="history-list"></div>
-            <button id="clearHistory" class="secondary-btn" data-i18n="clearHistory">Clear History</button>
+            <button id="clearHistory" class="secondary-btn" data-i18n="clearHistory">Limpiar Historial</button>
         </div>
     </div>
 
